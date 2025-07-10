@@ -1,6 +1,7 @@
 'use client'; // if using app directory
 
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import Image from 'next/image';
 import * as Yup from 'yup';
 
 const LoginSchema = Yup.object().shape({
@@ -12,15 +13,28 @@ const LoginSchema = Yup.object().shape({
 
 export default function LoginPage() {
   return (
-    <div className=" flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login your Account</h2>
+     <div className="min-h-[85vh] flex flex-col md:flex-row items-center justify-center bg-gray-200 p-4 gap-6">
+      {/* Side Image */}
+      <div className="relative w-full md:w-[50%] h-64 md:h-[30rem]">
+        <Image
+          src="/images/assests company newweb/mainbanner.png"
+          alt="Banner"
+          fill
+          className="object-contain md:object-contain rounded-lg"
+        />
+      </div>
+
+      {/* Login Form */}
+      <div className="w-full md:w-[26rem] bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold mb-6 text-center text-[#de6a2a]">
+          Login your Account
+        </h2>
         <Formik
           initialValues={{ email: '', password: '' }}
           validationSchema={LoginSchema}
           onSubmit={(values, { resetForm }) => {
-            console.log('Login values:', values);
-            resetForm();
+            console.log('Login values:', values)
+            resetForm()
           }}
         >
           {({ isSubmitting }) => (

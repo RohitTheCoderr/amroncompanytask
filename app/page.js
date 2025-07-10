@@ -3,22 +3,22 @@
 import { useState } from "react";
 import Image from "next/image";
 import ProductCard from "./(components)/productcard";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const images = [
   // "/images/assests company newweb/mainbanner.png",
   "/images/assests company newweb/mainbanner1.webp",
   "/images/assests company newweb/mainbanner2.webp",
-  "/images/assests company newweb/mainbanner-3.jpg",
+  // "/images/assests company newweb/mainbanner-3.jpg",
 ];
 
 const productsArray = [
   {
-    name: "shirt with full baju",
+    name: "I love you khushi shirt with full baju ",
     image: "/images/assests company newweb/Rectangle 58.png",
     price: 499,
     dis: 15,
@@ -65,30 +65,34 @@ const productsArray = [
 ];
 
 export default function Home() {
-  const [my, setMy]=useState()
+  const [my, setMy] = useState();
   return (
     <div className="w-full min-h-min">
       <Swiper
-      modules={[Autoplay, Navigation, Pagination]}
-      autoplay={{
-        delay: 3000,
-        disableOnInteraction: false,
-        pauseOnMouseEnter: true,
-      }}
-      loop={true}
-      navigation
-      pagination={{ clickable: true , color:"#de6a2a"} }
-      className="w-full h-[25rem]"
-    >
-      {images.map((img, index) => (
-        <SwiperSlide key={index}>
-          <div className="relative w-auto h-[25rem]">
-            <Image src={img} alt={`Banner ${index}`} fill className="" />
-          </div>
-        </SwiperSlide>
-      ))}
-    </Swiper>
-      <div className="text-3xl text-center font-bold mt-12 mb-8 capitalize">
+        modules={[Autoplay, Navigation, Pagination]}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        loop={true}
+        navigation
+        pagination={{ clickable: true, color: "#de6a2a" }}
+        className="w-full min-h-[10rem] h-auto"
+      >
+        {images.map((img, index) => (
+          <SwiperSlide key={index}>
+            <Image
+              src={img}
+              alt={`Banner ${index}`}
+              width={1200} // or any large width
+              height={600} // or any height based on your image aspect
+              className="w-full min-h-[10rem] h-auto object-cover"
+            />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+      <div className="text-2xl sm:text-3xl text-center font-bold mt-12 mb-8 capitalize">
         Our Popular products
       </div>
       {/* Product List */}
