@@ -3,6 +3,10 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import Image from 'next/image';
 import * as Yup from 'yup';
+import { postData } from '../utils/apicall';
+import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+import { setToken } from '../../reduxStore/slices/authSlice';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -12,8 +16,28 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function LoginPage() {
+  const dispatch = useDispatch();
+
+  const handlelogin = async (value) => {
+    try {
+      const promise = postData("/users/login", value)
+      toast.promise(promise, {
+        pending: 'You are logging in...',
+        success: 'You are logged in successfully!',
+        error: "You can't be logged in.",
+      });
+      const response = await promise;
+      if (response?.data?.token) {
+        dispatch(setToken(response?.data?.token)); // Save token in Redux
+      }
+    } catch (error) {
+      console.log("error occured while login", error);
+    }
+  }
+
+
   return (
-     <div className="min-h-[85vh] flex flex-col md:flex-row items-center justify-center bg-gray-200 p-4 gap-6">
+    <div className="min-h-[85vh] flex flex-col md:flex-row items-center justify-center bg-gray-200 p-4 gap-6">
       {/* Side Image */}
       <div className="relative w-full md:w-[50%] h-64 md:h-[30rem]">
         <Image
@@ -33,7 +57,7 @@ export default function LoginPage() {
           initialValues={{ email: '', password: '' }}
           validationSchema={LoginSchema}
           onSubmit={(values, { resetForm }) => {
-            console.log('Login values:', values)
+            handlelogin(values)
             resetForm()
           }}
         >

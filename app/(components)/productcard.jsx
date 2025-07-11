@@ -3,6 +3,7 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 
 import { useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux';
 
 function ProductCard({ items }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,11 +11,16 @@ function ProductCard({ items }) {
   const { name, image, price, size, description, dis } = items
   const MRP = (price * (100 + dis) / 100).toFixed(2);
 
-
-   const router = useRouter()
+  const router = useRouter();
+  const token = useSelector((state) => state.auth.token);
 
   const handleCheckout = () => {
-    router.push('/checkout') // Replace with your target route
+    if (token) {
+      router.push('/confirmorder') // Replace with your target route
+    }
+    else{
+      router.push('/checkout') // Replace with your target route
+    }
   }
 
 

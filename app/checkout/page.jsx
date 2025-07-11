@@ -3,6 +3,8 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useRouter } from 'next/navigation';
 import * as Yup from 'yup';
+import { postData } from '../utils/apicall';
+import { toast } from 'react-toastify';
 
 const LoginSchema = Yup.object().shape({
   firstname: Yup.string().min(2, 'First name must be at least 2 characters').required('Required'),
@@ -17,8 +19,27 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function Checkout() {
-
   const router = useRouter()
+
+  const handleSubmit = async (value) => {
+    delete value.confirmpassword;
+    try {
+      const promise = postData("/users/create", value)
+      toast.promise(
+        promise, {
+        pending: "user creating..",
+        success: "user created successfully..",
+        reject: "user can't be created.."
+      });
+
+      const response = await promise;
+      if (response?.success) {
+        router.push('/confirmorder') // Replace with your target route
+      }
+    } catch (error) {
+      console.log("error occurred", error);
+    }
+  }
 
   return (
     <div className=" flex items-center justify-center bg-gray-100 p-4">
@@ -34,8 +55,7 @@ export default function Checkout() {
           }}
           validationSchema={LoginSchema}
           onSubmit={(values, { resetForm }) => {
-            console.log('checkout values:', values);
-            router.push('/confirmorder') // Replace with your target route
+            handleSubmit(values)
             resetForm();
           }}
         >
