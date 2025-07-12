@@ -19,9 +19,6 @@ function Navbar() {
 
   const cartCount = useSelector(state =>(state.cart?.items));
 
-  console.log("count", cartCount?.length);
-  
-
   // Close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -95,7 +92,7 @@ function Navbar() {
             <div className="">
               <h3 className="font-bold px-4 bg-gray-200">For User</h3>
             </div>
-            <Link href="/orders" onClick={handleLinkClick} className="block px-4 py-1 hover:bg-gray-100">Order History</Link>
+            <Link href="/orderhistory" onClick={handleLinkClick} className="block px-4 py-1 hover:bg-gray-100">Order History</Link>
           </div>
         )}
       </div>

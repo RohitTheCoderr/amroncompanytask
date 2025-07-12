@@ -21,38 +21,27 @@ const images = [
 
 export default function Home() {
   const dispatch = useDispatch();
+
+  const [productslist, setProductslist]=useState([])
+
   const { items, loading, error } = useSelector((state) => state.products);
-  // const cart = useSelector((state) => state.products);
-
-  useEffect(() => {
+ useEffect(() => {
+  if (!items || items.length === 0) {
     dispatch(fetchAllProducts());
-    dispatch(clearCart());
-  }, [dispatch]);
+  }
+}, [dispatch]);
 
-// const [products,setProducts]=useState([])
-  // setProducts(items)
+useEffect(() => {
+  if (items?.length > 0) {
+    setProductslist(items);
+    localStorage.setItem("products", JSON.stringify(items));
+  } else {
+    const stored = JSON.parse(localStorage.getItem("products")) || [];
+    setProductslist(stored);
+  }
+}, [items]);
 
-  // if (loading) return <p>Loading...</p>;
-
-  // const getAllproducts = async () => {
-  //   try {
-  //     const promise = getData("/products/getallproducts");
-  //     const response = await promise;
-  //     const data = response?.data;
-  //     console.log("productslist", data);
-
-  //     setProducts(data);
-  //   } catch (error) {
-  //     console.log("error occured while login", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   getAllproducts();
-  // }, []);
-
-  console.log("itemslist", items);
-  
-
+  // console.log("productslist", productslist);
 
   return (
     <div className="w-full min-h-min">
@@ -68,7 +57,7 @@ export default function Home() {
         pagination={{ clickable: true, color: "#de6a2a" }}
         className="w-full min-h-[10rem] h-auto"
       >
-        {images.map((img, index) => (
+        {images?.map((img, index) => (
           <SwiperSlide key={index}>
             <Image
               src={img}
@@ -85,7 +74,7 @@ export default function Home() {
       </div>
      
         <div className="flex justify-around flex-wrap gap-6 px-12">
-          {items?.map((details, index) => (
+          {productslist?.map((details, index) => (
             <ProductCard key={index} items={details} />
           ))}
         </div>

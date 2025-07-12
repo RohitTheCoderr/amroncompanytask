@@ -14,14 +14,6 @@ function getToken() {
   return reduxToken || localStorageToken || "";
 }
 
-
-// function getToken() {
-//   const state = useAuthStore.getState();
-//   return state.token || localStorage.getItem("token") || "";
-// }
-
-
-
 async function handleResponse(response) {
   if (response.status >= 200 && response.status < 300) {
     return response.data;
@@ -50,8 +42,6 @@ async function apiCall(endpoint, method = "GET", data = null) {
   }
 
   try {
-    console.log("options",options);
-    
     const response = await axios(options);
     return await handleResponse(response);
   } catch (error) {

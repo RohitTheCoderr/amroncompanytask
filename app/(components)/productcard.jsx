@@ -5,42 +5,48 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../reduxStore/slices/cartSlice';
+import { setCheckoutProducts } from '../../reduxStore/slices/checkoutSlice';
 
 function ProductCard({ items }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter();
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const { _id, productName, images, price, size, description, discount, color, manufacturer } = items
   const MRP = (price * (100 + discount) / 100).toFixed(2);
-
-  const router = useRouter();
-  const token = useSelector((state) => state.auth.token);
+  // const token = useSelector((state) => state.auth.token);
 
   const sizeArray = size
     .replace(/[\[\]]/g, '')
     .split(',')
     .map(s => s.trim());
 
-  const dispatch = useDispatch();
 
   const handleCheckout = () => {
+    let checkoutItem={
+      ...items,
+    }
+    dispatch(setCheckoutProducts(checkoutItem)); // ✅ overrides old data
+    localStorage.setItem("checkoutProducts", JSON.stringify(checkoutItem));
+    router.push("/checkout");
+  };
 
-    const product = {
-      productId: _id, // replace with actual product ID
-      productName: productName,
-      price: price,
-      images: images,
-      size: size, // dynamically selected
-      description:description,
-      discount:discount
-    };
 
-    dispatch(addToCart(product));
+  // const handleCheckout = () => {
+  //   const product = {
+  //     productId: _id, // replace with actual product ID
+  //     productName: productName,
+  //     price: price,
+  //     images: images,
+  //     size: size, // dynamically selected
+  //     description:description,
+  //     discount:discount
+  //   };
 
-    // dispatch(addToCart(items));
-    // localStorage.setItem('guestCart', JSON.stringify(items));
-
-    router.push('/checkout') // Replace with your target route
-  }
+  //   dispatch(addToCart(product));
+  //   router.push('/checkout') // Replace with your target route
+  // }
 
   return (
     <>
@@ -70,8 +76,8 @@ function ProductCard({ items }) {
 
           {/* Buttons */}
           <div className="flex gap-2">
-            <button className="flex-1 text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] text-sm py-1 rounded transition" onClick={handleCheckout}>Checkout</button>
-            <button className="flex-1 border border-[#de6a2a] text-[#de6a2a] text-sm py-1 rounded hover:bg-orange-50 transition" onClick={() => setIsModalOpen(true)}>Quick View</button>
+            <button className="flex-1 text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] text-sm py-1 rounded transition cursor-pointer" onClick={handleCheckout}>Checkout</button>
+            <button className="flex-1 border border-[#de6a2a] text-[#de6a2a] text-sm py-1 rounded hover:bg-orange-50 transition cursor-pointer" onClick={() => setIsModalOpen(true)}>Quick View</button>
           </div>
         </div>
       </div>
