@@ -1,145 +1,115 @@
-'use client'; // if using app directory
+'use client';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Detailsform from '../detailsform/page';
+import { decrementCartCount, incrementCartCount } from '../../reduxStore/slices/cartCountSlice';
 
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { useRouter } from 'next/navigation';
-import * as Yup from 'yup';
-import { postData } from '../utils/apicall';
-import { toast } from 'react-toastify';
+const Checkout = () => {
+  // const cartItems = useSelector(state => state.cart.items);
+  const [isform, setIsform] = useState(false)
 
-const LoginSchema = Yup.object().shape({
-  firstname: Yup.string().min(2, 'First name must be at least 2 characters').required('Required'),
-  lastname: Yup.string().min(2, 'Last name must be at least 2 characters').required('Required'),
-  email: Yup.string().email('Invalid email').required('Required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Required'),
-  confirmpassword: Yup.string()
-    .oneOf([Yup.ref('password'), null], 'Passwords must match')
-    .required('Required'),
-});
-
-export default function Checkout() {
-  const router = useRouter()
-
-  const handleSubmit = async (value) => {
-    delete value.confirmpassword;
-    try {
-      const promise = postData("/users/create", value)
-      toast.promise(
-        promise, {
-        pending: "user creating..",
-        success: "user created successfully..",
-        reject: "user can't be created.."
-      });
-
-      const response = await promise;
-      if (response?.success) {
-        router.push('/confirmorder') // Replace with your target route
-      }
-    } catch (error) {
-      console.log("error occurred", error);
-    }
+  const handleclick = () => {
+    setIsform(true)
   }
 
+  const dispatch = useDispatch();
+  // const cartCount = useSelector(state =>
+  //   Array.isArray(state.cart?.items)
+  //     ? state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  //     : 0
+
+  // );
+   const cart = useSelector(state =>(state.cart?.items));
+  console.log("cartdata", cart);
+  const cartCount=cart?.length
+
+  // const cartCount = useSelector((state) => state.cartCount.count);
+  // const cart = JSON.parse(localStorage.getItem('guestCart'));
+  // console.log("cartguest", cart);
+  let { _id, productName, images, price, size, description, discount, color, manufacturer, Quantity = 1 } = cart[0]
+  let MRP = (price * (100 + discount) / 100).toFixed(0) * cartCount;
+  price = price * cartCount
+  let dicsountprice = MRP - price
+
   return (
-    <div className=" flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Fill  Your Details</h2>
-        <Formik
-          initialValues={{
-            firstname: '',
-            lastname: '',
-            email: '',
-            password: '',
-            confirmpassword: '',
-          }}
-          validationSchema={LoginSchema}
-          onSubmit={(values, { resetForm }) => {
-            handleSubmit(values)
-            resetForm();
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form className="space-y-4">
-              {/* firstname */}
-              <div>
-                <label htmlFor="text" className="block font-medium text-gray-700">
-                  First Name
-                </label>
-                <Field
-                  type="text"
-                  name="firstname"
-                  id="firstname"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+    <>
+      {
+        isform ? <Detailsform /> : (
+          <div className="p-4 py-12 min-h-[85vh] w-full flex flex-wrap justify-around items-start">
+            {/* Cart Item */}
+            <div className="flex max-sm:w-full sm:w-1/2 gap-4 items-start border-b border-gray-300 shadow p-3">
+              <div className="w-28 h-28 relative rounded-sm overflow-hidden">
+                <Image
+                  // src={`data:${images[0]?.contentType};base64,${images[0]?.data}`}
+                  // alt={productName}
+                  src="/images/portfolioImg/farmarea.jpg"
+                  alt="Product Area"
+                  fill
+                  className="object-cover"
                 />
-                <ErrorMessage name="firstname" component="div" className="text-red-500 text-sm" />
               </div>
-              {/* lastname */}
-              <div>
-                <label htmlFor="text" className="block font-medium text-gray-700">
-                  Last Name
-                </label>
-                <Field
-                  type="text"
-                  name="lastname"
-                  id="lastname"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                />
-                <ErrorMessage name="lastname" component="div" className="text-red-500 text-sm" />
+              <div className="flex max-lg:flex-wrap gap-2 w-full justify-between flex-1">
+                <div className='w-full'>
+                  <h3 className="text-lg font-semibold">{productName}</h3>
+                  <p className="text-gray-500 text-sm line-clamp-1">{description}</p>
+                </div>
+                <div className="flex gap-8 items-center">
+                  <div className="flex items-center gap-2 text-sm">
+                    Quantity:
+                    <button
+                      onClick={() => dispatch(decrementCartCount())}
+                      className="bg-gray-300 px-2 rounded hover:bg-gray-400"
+                    >
+                      -
+                    </button>
+                    <span className="bg-gray-200 px-3 py-1 rounded border text-black">
+                      {cartCount}
+                    </span>
+                    <button
+                      onClick={() => dispatch(incrementCartCount())}
+                      className="bg-gray-300 px-2 rounded hover:bg-gray-400"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="flex items-center text-sm">
+                    Rs:
+                    <span className="text-[#de6a2a] px-1 py-1 rounded">{price}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label htmlFor="email" className="block font-medium text-gray-700">
-                  Email
-                </label>
-                <Field
-                  type="email"
-                  name="email"
-                  id="email"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                />
-                <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
-              </div>
+            </div>
 
-              {/* Password */}
-              <div>
-                <label htmlFor="password" className="block font-medium text-gray-700">
-                  Password
-                </label>
-                <Field
-                  type="password"
-                  name="password"
-                  id="password"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                />
-                <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
+            {/* Price Summary */}
+            <div className="max-sm:w-full flex justify-end">
+              <div className='flex-col w-full sm:w-[20rem]'>
+                <div className="w-full border border-gray-300 rounded-lg p-4 space-y-3 shadow-sm">
+                  <h3 className="text-lg font-bold border-b pb-2">Price Details</h3>
+                  <div className="flex justify-between">
+                    <span>Total MRP:</span>
+                    <span>{MRP}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Discount on MRP:</span>
+                    <span>- ₹{dicsountprice}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-lg border-t pt-2">
+                    <span>Total Amount:</span>
+                    <span>{price}</span>
+                  </div>
+                </div>
+                {/* <Link href={"/detailsform"}> <button className='text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] rounded-lg outline-none w-full mt-3 py-3 cursor-pointer text-lg'>Proceed to Checkout</button></Link> */}
+                <button onClick={handleclick} className='text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] rounded-lg outline-none w-full mt-3 py-3 cursor-pointer text-lg'>Proceed to Checkout</button>
               </div>
+            </div>
+          </div>
+        )
+      }
+    </>
 
-              {/*confirm Password */}
-              <div>
-                <label htmlFor="password" className="block font-medium text-gray-700">
-                  confirm Password
-                </label>
-                <Field
-                  type="password"
-                  name="confirmpassword"
-                  id="confirmpassword"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                />
-                <ErrorMessage name="confirmpassword" component="div" className="text-red-500 text-sm" />
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-[#de6a2a] hover:bg-[#ffa264] text-white font-semibold py-2 px-4 rounded"
-              >
-                {isSubmitting ? 'Submiting in...' : 'Submit'}
-              </button>
-            </Form>
-          )}
-        </Formik>
-      </div>
-    </div>
   );
-}
+};
+
+export default Checkout;

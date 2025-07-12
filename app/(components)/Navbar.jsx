@@ -4,11 +4,23 @@ import Link from "next/link";
 import { ShoppingCartIcon, UserIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useEffect, useRef, useState } from "react";
 import NavLink from "./NavLink";
+import { useSelector } from "react-redux";
 
 function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const dropdownRef = useRef(null);
+
+  // const cartCount = useSelector(state =>
+  //   Array.isArray(state.cart?.items)
+  //     ? state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  //     : 0
+  // );
+
+  const cartCount = useSelector(state =>(state.cart?.items));
+
+  console.log("count", cartCount?.length);
+  
 
   // Close dropdown when clicked outside
   useEffect(() => {
@@ -17,7 +29,6 @@ function Navbar() {
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -48,10 +59,6 @@ function Navbar() {
         <NavLink href="/">Home</NavLink>
         <NavLink href="/about">About</NavLink>
         <NavLink href="/service">Service</NavLink>
-
-        {/* <Link href="/" className="hover:text-[#de6a2a] transition">Home</Link>
-        <Link href="/about" className="hover:text-[#de6a2a] transition">About</Link>
-        <Link href="/service" className="hover:text-[#de6a2a] transition">Service</Link> */}
       </nav>
 
       {/* Cart & User */}
@@ -60,7 +67,7 @@ function Navbar() {
           <div className="relative cursor-pointer">
             <ShoppingCartIcon className="h-6 w-6 text-gray-700 hover:text-[#de6a2a]" />
             <span className="absolute -top-2 -right-2 bg-[#de6a2a] text-white text-xs px-1.5 py-0.5 rounded-full">
-              3
+              {cartCount?.length}
             </span>
           </div>
         </Link>

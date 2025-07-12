@@ -3,42 +3,59 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 
 import { useRouter } from 'next/navigation'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart } from '../../reduxStore/slices/cartSlice';
 
 function ProductCard({ items }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { name, image, price, size, description, dis } = items
-  const MRP = (price * (100 + dis) / 100).toFixed(2);
+  const { _id, productName, images, price, size, description, discount, color, manufacturer } = items
+  const MRP = (price * (100 + discount) / 100).toFixed(2);
 
   const router = useRouter();
   const token = useSelector((state) => state.auth.token);
 
-  const handleCheckout = () => {
-    if (token) {
-      router.push('/confirmorder') // Replace with your target route
-    }
-    else{
-      router.push('/checkout') // Replace with your target route
-    }
-  }
+  const sizeArray = size
+    .replace(/[\[\]]/g, '')
+    .split(',')
+    .map(s => s.trim());
 
+  const dispatch = useDispatch();
+
+  const handleCheckout = () => {
+
+    const product = {
+      productId: _id, // replace with actual product ID
+      productName: productName,
+      price: price,
+      images: images,
+      size: size, // dynamically selected
+      description:description,
+      discount:discount
+    };
+
+    dispatch(addToCart(product));
+
+    // dispatch(addToCart(items));
+    // localStorage.setItem('guestCart', JSON.stringify(items));
+
+    router.push('/checkout') // Replace with your target route
+  }
 
   return (
     <>
       <div className="h-[26rem] w-[15rem] bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
         <div className="w-[100%] sm:w-[15rem] aspect-square mx-auto relative">
           <Image
-            src={image}
-            alt={image}
+            src={`data:${images[0]?.contentType};base64,${images[0]?.data}`}
+            alt={productName}
             fill
             className="object-cover rounded"
           />
         </div>
-
         {/* Product Info */}
         <div className="p-2 flex flex-col justify-between ">
-          <h2 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">{name}</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">{productName}</h2>
 
           <div className="flex items-center justify-start gap-4 mb-1">
             <span className="text-[#de6a2a] font-bold text-xl">₹{price}</span>
@@ -58,7 +75,6 @@ function ProductCard({ items }) {
           </div>
         </div>
       </div>
-
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] sm:w-[30rem] h-auto sm:min-h-[40rem] rounded-lg p-2 sm:p-4 relative">
@@ -71,21 +87,26 @@ function ProductCard({ items }) {
             </div>
             <div className="w-[90%] sm:w-[18rem] aspect-square relative mx-auto mb-4">
               <Image
-                src={image}
-                alt={name}
+                src={`data:${images[0]?.contentType};base64,${images[0]?.data}`}
+                alt={productName}
                 fill
                 className="object-cover rounded"
               />
             </div>
             {/* Details */}
-            <div className="p-2 space-y-2">
-              <h2 className="text-lg font-semibold text-gray-800">{name}</h2>
-              <div className=" text-sm">MRP: <span className='text-[#de6a2a] font-bold text-xl'>₹{MRP}</span></div>
-              <div className=" text-sm">Discount: <span className='text-[#de6a2a] font-bold'>{dis}%</span></div>
+            <div className="p-2 space-y-1">
+              <h2 className="text-lg font-semibold text-gray-800">{productName}</h2>
+              <div className='flex gap-6 items-baseline '>
+                <div>
+                  <div className=" text-sm">MRP: <span className='text-[#de6a2a] font-bold text-xl'>₹{MRP}</span></div>
+                  <div className=" text-sm">Discount: <span className='text-[#de6a2a] font-bold'>{discount}%</span></div>
+                </div>
+                <div className="text-black font-medium">Color: <span className='font-normal'>{color}</span></div>
+              </div>
 
               <div className="flex items-center gap-2">
                 Size:
-                {size.map((siz, idx) => (
+                {sizeArray?.map((siz, idx) => (
                   <div
                     key={idx}
                     className="border border-gray-300 rounded text-center w-10 h-10 flex items-center justify-center hover:bg-gray-200 cursor-pointer"
@@ -94,14 +115,13 @@ function ProductCard({ items }) {
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-gray-500">{description}</p>
+              <p className="text-sm text-gray-500"><span className='font-semibold text-lg text-black'>description: </span>{description}</p>
+              <p className="text-sm text-gray-500"><span className='font-semibold text-lg text-black'>Manufacturer by: </span>{manufacturer}</p>
               <div className="text-yellow-500">⭐⭐⭐⭐⭐</div>
             </div>
           </div>
         </div>
       )}
-
-
     </>
 
   );

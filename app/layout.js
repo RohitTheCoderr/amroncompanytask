@@ -31,8 +31,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased scroll-auto`}
       >
-        <ToastContainer position="top-right" autoClose={3000} />
         <ReduxProvider>
+          <ToastContainer position="top-right" autoClose={3000} />
           <Navbar />
           {children}
           <Footer />

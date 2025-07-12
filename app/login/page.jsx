@@ -7,6 +7,7 @@ import { postData } from '../utils/apicall';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { setToken } from '../../reduxStore/slices/authSlice';
+import { syncGuestCartToBackend } from '../utils/syncCartToBackend';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -28,7 +29,12 @@ export default function LoginPage() {
       });
       const response = await promise;
       if (response?.data?.token) {
-        dispatch(setToken(response?.data?.token)); // Save token in Redux
+        // dispatch(setToken(response?.data?.token)); // Save token in Redux
+
+        // Save token
+          localStorage.setItem('token', response.data.token);
+          // Sync guest cart
+          await syncGuestCartToBackend();  // for gestuser
       }
     } catch (error) {
       console.log("error occured while login", error);

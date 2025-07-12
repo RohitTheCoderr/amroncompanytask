@@ -2,8 +2,29 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+  import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setCartItems } from '../../reduxStore/slices/cartSlice';
+import { getData } from '../utils/apicall';
 
 const CartPage = () => {
+const dispatch=useDispatch()
+
+const fetchUserCart = async (dispatch) => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  const res =  getData('/users/getusercartlist');
+  const cart =await res
+  const data =await cart?.data || [];
+  dispatch(setCartItems(data));
+};
+  
+useEffect(() => {
+  fetchUserCart(dispatch);
+}, []);
+
+
   return (
     <div className="p-4 py-12 min-h-[85vh] w-full flex flex-wrap justify-around items-start">
       {/* Cart Item */}

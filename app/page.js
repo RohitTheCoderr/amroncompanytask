@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import ProductCard from "./(components)/productcard";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -8,64 +8,52 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { getData } from "./utils/apicall";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllProducts } from "../reduxStore/slices/productSlice";
+import { clearCart } from "../reduxStore/slices/cartSlice";
 
 const images = [
-  // "/images/assests company newweb/mainbanner.png",
   "/images/assests company newweb/mainbanner1.webp",
   "/images/assests company newweb/mainbanner2.webp",
   // "/images/assests company newweb/mainbanner-3.jpg",
 ];
 
-const productsArray = [
-  {
-    name: "I love you khushi shirt with full baju ",
-    image: "/images/assests company newweb/Rectangle 58.png",
-    price: 499,
-    dis: 15,
-    size: ["S", "M", "L", "Xl"],
-    description:
-      "One of the best cloths in india its super soft shirt fevric is also best quality",
-  },
-  {
-    name: "shirt with full baju",
-    image: "/images/assests company newweb/Rectangle 57.png",
-    price: 399,
-    dis: 10,
-    size: ["S", "M", "L", "Xl"],
-    description:
-      "One of the best cloths in india its super soft shirt fevric is also best quality",
-  },
-  {
-    name: "shirt with full baju",
-    image: "/images/assests company newweb/Rectangle 59.png",
-    price: 699,
-    dis: 10,
-    size: ["S", "M", "L", "Xl"],
-    description:
-      "One of the best cloths in india its super soft shirt fevric is also best quality",
-  },
-  {
-    name: "shirt with full baju",
-    image: "/images/assests company newweb/Rectangle 60.png",
-    price: 449,
-    dis: 25,
-    size: ["S", "M", "L", "Xl"],
-    description:
-      "One of the best cloths in india its super soft shirt fevric is also best quality",
-  },
-  {
-    name: "shirt with full baju",
-    image: "/images/assests company newweb/Rectangle 61.png",
-    price: 479,
-    dis: 12,
-    size: ["S", "M", "L", "Xl"],
-    description:
-      "One of the best cloths in india its super soft shirt fevric is also best quality",
-  },
-];
-
 export default function Home() {
-  const [my, setMy] = useState();
+  const dispatch = useDispatch();
+  const { items, loading, error } = useSelector((state) => state.products);
+  // const cart = useSelector((state) => state.products);
+
+  useEffect(() => {
+    dispatch(fetchAllProducts());
+    dispatch(clearCart());
+  }, [dispatch]);
+
+// const [products,setProducts]=useState([])
+  // setProducts(items)
+
+  // if (loading) return <p>Loading...</p>;
+
+  // const getAllproducts = async () => {
+  //   try {
+  //     const promise = getData("/products/getallproducts");
+  //     const response = await promise;
+  //     const data = response?.data;
+  //     console.log("productslist", data);
+
+  //     setProducts(data);
+  //   } catch (error) {
+  //     console.log("error occured while login", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   getAllproducts();
+  // }, []);
+
+  console.log("itemslist", items);
+  
+
+
   return (
     <div className="w-full min-h-min">
       <Swiper
@@ -95,12 +83,13 @@ export default function Home() {
       <div className="text-2xl sm:text-3xl text-center font-bold mt-12 mb-8 capitalize">
         Our Popular products
       </div>
-      {/* Product List */}
-      <div className="flex justify-around flex-wrap gap-6 px-12">
-        {productsArray.map((details, index) => (
-          <ProductCard key={index} items={details} />
-        ))}
-      </div>
+     
+        <div className="flex justify-around flex-wrap gap-6 px-12">
+          {items?.map((details, index) => (
+            <ProductCard key={index} items={details} />
+          ))}
+        </div>
+    
     </div>
   );
 }

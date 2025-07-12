@@ -50,6 +50,8 @@ async function apiCall(endpoint, method = "GET", data = null) {
   }
 
   try {
+    console.log("options",options);
+    
     const response = await axios(options);
     return await handleResponse(response);
   } catch (error) {
