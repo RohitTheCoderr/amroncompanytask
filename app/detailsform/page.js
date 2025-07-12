@@ -1,14 +1,9 @@
 "use client"; // if using app directory
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { useRouter, useSearchParams } from "next/navigation";
 import * as Yup from "yup";
 import { postData } from "../utils/apicall";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { addToCart } from "../../reduxStore/slices/cartSlice";
-import { useEffect, useState } from "react";
-// import { addToCart } from '../../reduxStore/slices/cartSlice';
 
 const LoginSchema = Yup.object().shape({
   firstname: Yup.string()
@@ -27,11 +22,6 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function Detailsform({ setIscall }) {
-  const router = useRouter();
-  const dispatch = useDispatch();
-  const searchParams = useSearchParams();
-  const _id = searchParams.get("_id");
-  // console.log("id", _id);
 
   const handleSubmit = async (value) => {
     delete value.confirmpassword;
@@ -43,12 +33,9 @@ export default function Detailsform({ setIscall }) {
         reject: "Form can't be Submitted..",
       });
       const response = await promise;
-      console.log("response form details", response);
-      // response?.data?.token
       if (response?.success) {
         localStorage.setItem("token", response?.data?.token);
         setIscall(true);
-        // router.push('/confirmorder') // Replace with your target route
       }
     } catch (error) {
       console.log("error occurred", error);

@@ -1,11 +1,10 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchCart } from '../../reduxStore/slices/cartSlice';
-import { useSelector } from "react-redux";
+import { TrashIcon } from '@heroicons/react/24/outline';
 
 const CartPage = () => {
   const dispatch = useDispatch()
@@ -90,6 +89,9 @@ const CartPage = () => {
                 </div>
               </div>
             </div>
+            <div><TrashIcon className="h-6 w-6 text-red-500 cursor-pointer hover:text-red-700" />
+            </div>
+
           </div>
         ))}
       </div>

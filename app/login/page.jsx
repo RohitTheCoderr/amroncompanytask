@@ -5,9 +5,6 @@ import Image from 'next/image';
 import * as Yup from 'yup';
 import { postData } from '../utils/apicall';
 import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import { setToken } from '../../reduxStore/slices/authSlice';
-import { syncGuestCartToBackend } from '../utils/syncCartToBackend';
 import { useRouter } from 'next/navigation';
 
 const LoginSchema = Yup.object().shape({
@@ -18,7 +15,6 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function LoginPage() {
-  const dispatch = useDispatch();
   const router = useRouter()
 
   const handlelogin = async (value) => {
@@ -31,12 +27,8 @@ export default function LoginPage() {
       });
       const response = await promise;
       if (response?.data?.token) {
-        // dispatch(setToken(response?.data?.token)); // Save token in Redux
-        // Save token
           localStorage.setItem('token', response.data.token);
           router.push('/orderhistory')
-          // Sync guest cart
-          // await syncGuestCartToBackend();  // for gestuser
       }
     } catch (error) {
       console.log("error occured while login", error);

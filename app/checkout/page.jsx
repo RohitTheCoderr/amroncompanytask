@@ -1,7 +1,7 @@
 "use client";
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Detailsform from '../detailsform/page';
 import { useRouter } from 'next/navigation'
 import { postData } from '../utils/apicall';
@@ -9,7 +9,6 @@ import { toast } from 'react-toastify';
 
 const Checkout = () => {
   const router = useRouter()
-  // const dispatch = useDispatch();
   const [isform, setIsform] = useState(false)
   const [iscall, setIscall] = useState(false)
   const [selectsize, setSelectsize] = useState("M")
@@ -26,12 +25,14 @@ const Checkout = () => {
       setQuantity(prev => prev - 1);
     }
   };
-  // const token = localStorage.getItem('token');
 
-   useEffect(() => {
-    const t = localStorage.getItem("token");
-    setToken(t || "");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const toke = localStorage.getItem("token");
+      setToken(toke || "");
+    }
   }, []);
+
 
   const handleclick = () => {
     if (!token) {
@@ -39,19 +40,33 @@ const Checkout = () => {
     }
     else {
       setIscall(true)
-      // router.push('/confirmorder')
     }
   }
 
   const reduxProducts = useSelector((state) => state.checkout.products);
+  // useEffect(() => {
+  //   if (reduxProducts?.length > 0) {
+  //     setProducts(reduxProducts);
+  //   } else {
+  //     const stored = JSON.parse(localStorage.getItem("checkoutProducts")) || [];
+  //     setProducts(stored);
+  //   }
+  // }, [reduxProducts]);
+
   useEffect(() => {
-    if (reduxProducts?.length > 0) {
-      setProducts(reduxProducts);
-    } else {
+  if (reduxProducts?.length > 0) {
+    setProducts(reduxProducts);
+  } else {
+    if (typeof window !== "undefined") {
       const stored = JSON.parse(localStorage.getItem("checkoutProducts")) || [];
       setProducts(stored);
+    } else {
+      // optional fallback (to prevent undefined state during SSR)
+      setProducts([]);
     }
-  }, [reduxProducts]);
+  }
+}, [reduxProducts]);
+
 
 
   let { _id, productName, images = [], price, size, description, discount, } = products
@@ -69,7 +84,7 @@ const Checkout = () => {
   };
 
   // place order api call
-   useEffect(() => {
+  useEffect(() => {
     if (!iscall) return;
 
     const placeOrder = async () => {
@@ -91,7 +106,7 @@ const Checkout = () => {
         const response = await promise;
         if (response.success) {
           router.push("/confirmorder");
-        } 
+        }
       } catch (err) {
         toast.error(err.message || "Something went wrong");
       }

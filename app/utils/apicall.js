@@ -3,13 +3,11 @@
 
 import axios from "axios";
 import { store } from "../../reduxStore";
-// import { useSelector } from "react-redux";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 function getToken() {
   // const state = store.getState(); // 👈 Access Redux state directly
   const state = store.getState();
-  // const reduxToken = useSelector((state) => state.auth.token);
   const reduxToken = state.auth.token;
   const localStorageToken =
     typeof window !== 'undefined' ? localStorage.getItem('token') : null;

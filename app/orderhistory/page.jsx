@@ -15,10 +15,6 @@ export default function Page() {
       try {
         const res = getData("/users/order"); // adjust endpoint
         const data = await res;
-
-        console.log("orderhistory", data);
-
-
         if (data?.orderHistory) {
           setOrders(data.orderHistory);
         }

@@ -3,10 +3,10 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 
 import { useRouter } from 'next/navigation'
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { addToCart } from '../../reduxStore/slices/cartSlice';
 import { setCheckoutProducts } from '../../reduxStore/slices/checkoutSlice';
-import { ShoppingCartIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon, } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 
 function ProductCard({ items }) {
@@ -17,13 +17,11 @@ function ProductCard({ items }) {
 
   const { _id, productName, images, price, size, description, discount, color, manufacturer } = items
   const MRP = (price * (100 + discount) / 100).toFixed(2);
-  // const token = useSelector((state) => state.auth.token);
 
   const sizeArray = size
     .replace(/[\[\]]/g, '')
     .split(',')
     .map(s => s.trim());
-
 
   const handleCheckout = () => {
     let checkoutItem = {
@@ -37,25 +35,18 @@ function ProductCard({ items }) {
 
   const handleaddtocart = () => {
     const token = localStorage.getItem("token");
-    console.log("token", token);
-    
     const product = {
       productId: _id, // replace with actual product ID
       size: "M", // dynamically selected
       Quantity: 1
     };
     
-    console.log("click", product);
     if (token) {
-      console.log("inside if");
-      
       dispatch(addToCart(product));
     } else {
       toast.message("please login first")
       router.push('/login')
     }
-
-
   }
 
   return (
