@@ -43,9 +43,6 @@ const Checkout = () => {
     }
   }
 
-
-
-
   const reduxProducts = useSelector((state) => state.checkout.products);
   useEffect(() => {
     if (reduxProducts?.length > 0) {
@@ -92,8 +89,6 @@ const Checkout = () => {
           error: "Order confirmation failed!",
         });
         const response = await promise;
-          console.log("response", response);
-          
         if (response.success) {
           router.push("/confirmorder");
         } 

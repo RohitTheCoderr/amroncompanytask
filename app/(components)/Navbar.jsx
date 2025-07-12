@@ -1,23 +1,18 @@
 'use client'; // Needed for using useState in App Router
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCartIcon, UserIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useEffect, useRef, useState } from "react";
 import NavLink from "./NavLink";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 function Navbar() {
+  const count = useSelector(state => state?.cart?.items?.listofproducts?.length || 0);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const dropdownRef = useRef(null);
-
-  // const cartCount = useSelector(state =>
-  //   Array.isArray(state.cart?.items)
-  //     ? state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
-  //     : 0
-  // );
-
-  const cartCount = useSelector(state =>(state.cart?.items));
 
   // Close dropdown when clicked outside
   useEffect(() => {
@@ -36,16 +31,41 @@ function Navbar() {
   };
 
 
+
+  const router = useRouter();
+
+  const [token, setToken] = useState(null);
+  // From Redux or Zustand or localStorage
+  // const token = useSelector((state) => state.auth.token); 
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken);
+    }
+  }, []);
+
+  const handleCartClick = () => {
+    if (token) {
+      router.push('/cart');
+    } else {
+      toast("please login first")
+      router.push('/login');
+    }
+  };
+
+
   return (
     <header className="w-full h-20 flex justify-between items-center px-6 sm:px-12 shadow-md bg-white">
 
       {/* Logo */}
       <Link href={"/"}>
-        <div className="w-32 relative h-12">
+        <div className="w-40 relative h-auto">
           <Image
             src="/images/logo.png" // Place your logo at /public/images/logo.png
             alt="Logo"
-            fill
+            width={80}
+            height={80}
             className="object-contain"
           />
         </div>
@@ -60,14 +80,13 @@ function Navbar() {
 
       {/* Cart & User */}
       <div className="w-[10rem] flex gap-6 items-center justify-end text-gray-700 font-medium">
-        <Link href="/cart">
-          <div className="relative cursor-pointer">
-            <ShoppingCartIcon className="h-6 w-6 text-gray-700 hover:text-[#de6a2a]" />
-            <span className="absolute -top-2 -right-2 bg-[#de6a2a] text-white text-xs px-1.5 py-0.5 rounded-full">
-              {cartCount?.length}
-            </span>
-          </div>
-        </Link>
+
+        <div onClick={handleCartClick} className="relative cursor-pointer">
+          <ShoppingCartIcon className="h-6 w-6 text-gray-700 hover:text-[#de6a2a]" />
+          <span className="absolute -top-2 -right-2 bg-[#de6a2a] text-white text-xs px-1.5 py-0.5 rounded-full">
+            {count}
+          </span>
+        </div>
         {/* Menu Icon (Hamburger) */}
         <div
           onClick={() => setIsDropdownOpen((prev) => !prev)}

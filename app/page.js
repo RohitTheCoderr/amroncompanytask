@@ -8,10 +8,9 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { getData } from "./utils/apicall";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllProducts } from "../reduxStore/slices/productSlice";
-import { clearCart } from "../reduxStore/slices/cartSlice";
+import { fetchCart } from "../reduxStore/slices/cartSlice";
 
 const images = [
   "/images/assests company newweb/mainbanner1.webp",
@@ -22,26 +21,25 @@ const images = [
 export default function Home() {
   const dispatch = useDispatch();
 
-  const [productslist, setProductslist]=useState([])
-
+  const [productslist, setProductslist] = useState([]);
   const { items, loading, error } = useSelector((state) => state.products);
- useEffect(() => {
-  if (!items || items.length === 0) {
-    dispatch(fetchAllProducts());
-  }
-}, [dispatch]);
+  
+  useEffect(() => {
+    if (!items || items.length === 0) {
+      dispatch(fetchAllProducts());
+    }
+    dispatch(fetchCart());
+  }, [dispatch]);
 
-useEffect(() => {
-  if (items?.length > 0) {
-    setProductslist(items);
-    localStorage.setItem("products", JSON.stringify(items));
-  } else {
-    const stored = JSON.parse(localStorage.getItem("products")) || [];
-    setProductslist(stored);
-  }
-}, [items]);
-
-  // console.log("productslist", productslist);
+  useEffect(() => {
+    if (items?.length > 0) {
+      setProductslist(items);
+      localStorage.setItem("products", JSON.stringify(items));
+    } else {
+      const stored = JSON.parse(localStorage.getItem("products")) || [];
+      setProductslist(stored);
+    }
+  }, [items]);
 
   return (
     <div className="w-full min-h-min">
@@ -72,13 +70,12 @@ useEffect(() => {
       <div className="text-2xl sm:text-3xl text-center font-bold mt-12 mb-8 capitalize">
         Our Popular products
       </div>
-     
-        <div className="flex justify-around flex-wrap gap-6 px-12">
-          {productslist?.map((details, index) => (
-            <ProductCard key={index} items={details} />
-          ))}
-        </div>
-    
+
+      <div className="flex justify-around flex-wrap gap-6 px-12">
+        {productslist?.map((details, index) => (
+          <ProductCard key={index} items={details} />
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getData } from '../../app/utils/apicall';
-// import axios from 'axios';
 
 export const fetchAllProducts = createAsyncThunk(
   'products/fetchAll',

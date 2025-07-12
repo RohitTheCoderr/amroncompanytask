@@ -6,13 +6,15 @@ import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../reduxStore/slices/cartSlice';
 import { setCheckoutProducts } from '../../reduxStore/slices/checkoutSlice';
+import { ShoppingCartIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { toast } from 'react-toastify';
 
 function ProductCard({ items }) {
   const dispatch = useDispatch();
   const router = useRouter();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const { _id, productName, images, price, size, description, discount, color, manufacturer } = items
   const MRP = (price * (100 + discount) / 100).toFixed(2);
   // const token = useSelector((state) => state.auth.token);
@@ -24,7 +26,7 @@ function ProductCard({ items }) {
 
 
   const handleCheckout = () => {
-    let checkoutItem={
+    let checkoutItem = {
       ...items,
     }
     dispatch(setCheckoutProducts(checkoutItem)); // ✅ overrides old data
@@ -33,24 +35,33 @@ function ProductCard({ items }) {
   };
 
 
-  // const handleCheckout = () => {
-  //   const product = {
-  //     productId: _id, // replace with actual product ID
-  //     productName: productName,
-  //     price: price,
-  //     images: images,
-  //     size: size, // dynamically selected
-  //     description:description,
-  //     discount:discount
-  //   };
+  const handleaddtocart = () => {
+    const token = localStorage.getItem("token");
+    console.log("token", token);
+    
+    const product = {
+      productId: _id, // replace with actual product ID
+      size: "M", // dynamically selected
+      Quantity: 1
+    };
+    
+    console.log("click", product);
+    if (token) {
+      console.log("inside if");
+      
+      dispatch(addToCart(product));
+    } else {
+      toast.message("please login first")
+      router.push('/login')
+    }
 
-  //   dispatch(addToCart(product));
-  //   router.push('/checkout') // Replace with your target route
-  // }
+
+  }
 
   return (
     <>
-      <div className="h-[26rem] w-[15rem] bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
+      <div className="relative h-[26rem] w-[15rem] bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
+        <div className='absolute right-4 top-4 z-30 rounded-full' ><ShoppingCartIcon onClick={handleaddtocart} className='h-6 w-6 text-gray-700 hover:text-[#de6a2a] cursor-pointer' /></div>
         <div className="w-[100%] sm:w-[15rem] aspect-square mx-auto relative">
           <Image
             src={`data:${images[0]?.contentType};base64,${images[0]?.data}`}

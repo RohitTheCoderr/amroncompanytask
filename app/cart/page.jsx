@@ -2,79 +2,117 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-  import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setCartItems } from '../../reduxStore/slices/cartSlice';
-import { getData } from '../utils/apicall';
+import { fetchCart } from '../../reduxStore/slices/cartSlice';
+import { useSelector } from "react-redux";
 
 const CartPage = () => {
-const dispatch=useDispatch()
+  const dispatch = useDispatch()
 
-const fetchUserCart = async (dispatch) => {
-  const token = localStorage.getItem('token');
-  if (!token) return;
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
 
-  const res =  getData('/users/getusercartlist');
-  const cart =await res
-  const data =await cart?.data || [];
-  dispatch(setCartItems(data));
-};
-  
-useEffect(() => {
-  fetchUserCart(dispatch);
-}, []);
+  const cartlist = useSelector(state => state?.cart?.items?.listofproducts);
 
+
+  const cartTotals = cartlist?.reduce(
+    (acc, item) => {
+      const safePrice = Number(item?.price) || 0;
+      const safeDiscount = Number(item?.discount) || 0;
+      const safeQuantity = Number(item?.Quantity) || 1;
+
+      // unit price with discount applied
+      const basePrice = Math.round(safePrice * (1 + safeDiscount / 100));
+      // full totals
+      const MRP = basePrice * safeQuantity;
+      const totalPrice = safePrice * safeQuantity;
+      const discountPrice = MRP - totalPrice;
+
+      // accumulate totals
+      acc.totalMRP += MRP;
+      acc.totalOriginal += totalPrice;
+      acc.totalDiscount += discountPrice;
+      return acc;
+    },
+    { totalMRP: 0, totalOriginal: 0, totalDiscount: 0 }
+  );
 
   return (
     <div className="p-4 py-12 min-h-[85vh] w-full flex flex-wrap justify-around items-start">
       {/* Cart Item */}
-      <div className="flex max-sm:w-full sm:w-1/2 gap-4 items-start border-b border-gray-300 shadow p-3">
-        <div className="w-28 h-28 relative rounded-sm overflow-hidden">
-          <Image
-            src="/images/portfolioImg/farmarea.jpg"
-            alt="Product Area"
-            fill
-            className="object-cover"
-          />
-        </div>
-        <div className="flex max-lg:flex-wrap gap-2 w-full justify-between flex-1">
-          <div className='w-full'>
-            <h3 className="text-lg font-semibold">Product Name</h3>
-            <p className="text-gray-500 text-sm line-clamp-1">Basic product details Basic product details
-               Basic product detailsBasic product detailsBasic product details</p>
-          </div>
-          <div className="flex gap-8 items-center">
-            <div className="flex items-center gap-2 text-sm">
-              Quantity:
-              <span className="bg-gray-200 px-2 py-1 rounded border text-black">2</span>
+      <div className=' max-md:w-full w-1/2 gap-4'>
+        <h2 className='font-medium text-[#de6a2a] text-2xl'>You cart products</h2>
+        {cartlist?.map((item) => (
+          <div key={item._id} className="flex w-full gap-4 items-start my-2 border-b border-gray-300 shadow p-3">
+            <div className="w-28 h-28 relative rounded-sm overflow-hidden">
+              <Image
+                src={`data:${item?.images[0]?.contentType};base64,${item?.images[0]?.data}`}
+                alt="product img"
+                fill
+                className="object-cover"
+              />
             </div>
-            <div className="flex items-center text-sm">
-              Rs:
-              <span className="text-[#de6a2a] px-1 py-1 rounded">299</span>
+            <div className="flex max-lg:flex-wrap gap-2 w-full justify-between flex-1">
+              <div className='w-full'>
+                <h3 className="text-lg font-semibold">{item?.productName}</h3>
+                <p className="text-gray-500 text-sm line-clamp-1">{item?.description}</p>
+              </div>
+              <div className="flex flex-col gap-4 items-start">
+                <div className="flex gap-8 items-center">
+                  <div className="flex items-center gap-1 text-sm">
+                    Quantity:
+                    {/* <button
+                    onClick={decrement}
+                    className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400 cursor-pointer"
+                  >
+                    -
+                  </button> */}
+                    <span className="bg-gray-200 px-3 py-1 rounded border text-black">
+                      {item?.Quantity}
+                    </span>
+                    {/* <button
+                    onClick={increment}
+                    className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400 cursor-pointer"
+                  >
+                    +
+                  </button> */}
+                  </div>
+                  <div className="flex items-center text-sm">
+                    Rs:
+                    <span className="text-[#de6a2a] px-1 py-1 rounded">{item?.price}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700">Size:</label>
+                  {item.size}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Price Summary */}
-      <div className="max-sm:w-full flex justify-end">
+      <div className="max-sm:w-full flex ">
         <div className='flex-col w-full sm:w-[20rem]'>
           <div className="w-full border border-gray-300 rounded-lg p-4 space-y-3 shadow-sm">
             <h3 className="text-lg font-bold border-b pb-2">Price Details</h3>
             <div className="flex justify-between">
               <span>Total MRP:</span>
-              <span>₹299</span>
+              <span>₹{cartTotals?.totalMRP}</span>
             </div>
             <div className="flex justify-between">
               <span>Discount on MRP:</span>
-              <span>- ₹0</span>
+              <span>- ₹{cartTotals?.totalDiscount}</span>
             </div>
             <div className="flex justify-between font-bold text-lg border-t pt-2">
               <span>Total Amount:</span>
-              <span>₹299</span>
+              <span>₹{cartTotals?.totalOriginal}</span>
             </div>
           </div>
-         <Link href={"/checkout"}> <button className='text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] rounded-lg outline-none w-full mt-3 py-3 cursor-pointer text-lg'>Proceed to Checkout</button></Link>
+          <Link href={"/checkout"}> <button className='text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] rounded-lg outline-none w-full mt-3 py-3 cursor-pointer text-lg'>Proceed to Checkout</button></Link>
         </div>
       </div>
     </div>
