@@ -6,6 +6,8 @@ import * as Yup from 'yup';
 import { postData } from '../utils/apicall';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { setToken } from '../../reduxStore/slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -16,6 +18,7 @@ const LoginSchema = Yup.object().shape({
 
 export default function LoginPage() {
   const router = useRouter()
+  const dispatch = useDispatch();
 
   const handlelogin = async (value) => {
     try {
@@ -27,8 +30,9 @@ export default function LoginPage() {
       });
       const response = await promise;
       if (response?.data?.token) {
-          localStorage.setItem('token', response.data.token);
-          router.push('/orderhistory')
+        dispatch(setToken(response?.data?.token));
+        // localStorage.setItem('token', response.data.token);
+        router.push('/orderhistory')
       }
     } catch (error) {
       console.log("error occured while login", error);

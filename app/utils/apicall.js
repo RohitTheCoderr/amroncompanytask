@@ -2,16 +2,17 @@
 'use client'; // at top of file
 
 import axios from "axios";
-import { store } from "../../reduxStore";
+// import { store } from "../../reduxStore";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 function getToken() {
   // const state = store.getState(); // 👈 Access Redux state directly
-  const state = store.getState();
-  const reduxToken = state.auth.token;
+  // const state = store.getState();
+  // const reduxToken = state.auth.token;
   const localStorageToken =
     typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  return reduxToken || localStorageToken || "";
+  return localStorageToken || "";
+  // return reduxToken || localStorageToken || "";
 }
 
 async function handleResponse(response) {

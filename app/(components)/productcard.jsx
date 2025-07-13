@@ -44,8 +44,9 @@ function ProductCard({ items }) {
     if (token) {
       dispatch(addToCart(product));
     } else {
-      toast.message("please login first")
-      router.push('/login')
+       toast("Please login first before adding product to cart");
+      // router.push('/login')
+      return
     }
   }
 

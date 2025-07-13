@@ -4,11 +4,18 @@ import Link from "next/link";
 import { ShoppingCartIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useEffect, useRef, useState } from "react";
 import NavLink from "./NavLink";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { clearToken } from "../../reduxStore/slices/authSlice";
+import { fetchCart } from "../../reduxStore/slices/cartSlice";
 
 function Navbar() {
+
+
+  const router = useRouter();
+  const dispatch = useDispatch();
+
   const count = useSelector(state => state?.cart?.items?.listofproducts?.length || 0);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -30,20 +37,29 @@ function Navbar() {
     setIsDropdownOpen(false);
   };
 
-
-
-  const router = useRouter();
-
   const [token, setToken] = useState(null);
   // From Redux or Zustand or localStorage
   // const token = useSelector((state) => state.auth.token); 
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedToken = localStorage.getItem("token");
-      setToken(storedToken);
-    }
+    const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    setToken(!!storedToken);
   }, []);
+
+
+  const handleAuthClick = () => {
+    if (token) {
+      // localStorage.removeItem("token");
+      dispatch(fetchCart());
+      dispatch(clearToken());
+      setToken(false);
+      toast("Logged out");
+      router.push("/"); // redirect to homepage or refresh
+    } else {
+      router.push("/login"); // redirect to login page
+    }
+  };
+
 
   const handleCartClick = () => {
     if (token) {
@@ -60,13 +76,23 @@ function Navbar() {
 
       {/* Logo */}
       <Link href={"/"}>
-        <div className="w-40 relative h-auto">
-          <Image
+        {/* <div className="w-40 relative h-auto"> */}
+        <div className="w-40 h-auto">
+          {/* <Image
             src="/images/logo.png" // Place your logo at /public/images/logo.png
             alt="Logo"
             width={80}
             height={80}
             className="object-contain"
+            /> */}
+          <Image
+            src="/images/logo.png"
+            alt="Logo"
+            width={80}
+            height={80}
+            className="object-contain"
+            style={{ height: "auto", width: "auto" }} // keeps ratio
+            priority
           />
         </div>
       </Link>
@@ -110,6 +136,12 @@ function Navbar() {
             {/* Always Show Order History */}
             <div className="">
               <h3 className="font-bold px-4 bg-gray-200">For User</h3>
+            </div>
+            <div
+              onClick={handleAuthClick}
+              className="cursor-pointer px-4 py-1 text-[#de6a2a] hover:underline"
+            >
+              {token ? "Logout" : "Login"}
             </div>
             <Link href="/orderhistory" onClick={handleLinkClick} className="block px-4 py-1 hover:bg-gray-100">Order History</Link>
           </div>

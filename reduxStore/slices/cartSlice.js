@@ -8,7 +8,6 @@ export const fetchCart = createAsyncThunk(
   async (_, thunkAPI) => {
     const res = getData("/users/getusercartlist");
     const response = await res;
-    console.log("dataresponsegetusercartlist", response);
     return response?.data; // Assuming your API returns `{ items: [...] }`
   }
 );
@@ -16,12 +15,8 @@ export const fetchCart = createAsyncThunk(
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ productId, Quantity, size }, thunkAPI) => {
-    console.log("productIssss", productId);
-    console.log("sizeIssss", size);
-    
     const data = postData("/users/addtocart", { productId, Quantity, size });
     const response = await data;
-    console.log("respopostcartaddtocart", response);
     if (response?.success) {
       thunkAPI.dispatch(fetchCart());
     }
@@ -34,7 +29,6 @@ export const removeFromCart = createAsyncThunk(
   async (productId, thunkAPI) => {
     const data = postData("/users/deletefromcart", { productId });
     const response = await data;
-    console.log("respopostcartaddtocart", response);
     if (response?.success) {
       thunkAPI.dispatch(fetchCart());
     }

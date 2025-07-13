@@ -4,6 +4,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { postData } from "../utils/apicall";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { setToken } from "../../reduxStore/slices/authSlice";
 
 const LoginSchema = Yup.object().shape({
   firstname: Yup.string()
@@ -23,6 +25,9 @@ const LoginSchema = Yup.object().shape({
 
 export default function Detailsform({ setIscall }) {
 
+  const dispatch = useDispatch();
+
+
   const handleSubmit = async (value) => {
     delete value.confirmpassword;
     try {
@@ -34,7 +39,8 @@ export default function Detailsform({ setIscall }) {
       });
       const response = await promise;
       if (response?.success) {
-        localStorage.setItem("token", response?.data?.token);
+          dispatch(setToken(response?.data?.token));
+        // localStorage.setItem("token", response?.data?.token);
         setIscall(true);
       }
     } catch (error) {

@@ -23,13 +23,16 @@ export default function Home() {
 
   const [productslist, setProductslist] = useState([]);
   const { items, loading, error } = useSelector((state) => state.products);
-  
+   const token = useSelector((state) => state.auth.token); // ✅ get token from Redux
+
   useEffect(() => {
     if (!items || items.length === 0) {
       dispatch(fetchAllProducts());
     }
-    dispatch(fetchCart());
-  }, [dispatch]);
+    if (token) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, token]);
 
   useEffect(() => {
     if (items?.length > 0) {
@@ -71,7 +74,7 @@ export default function Home() {
         Our Popular products
       </div>
 
-      <div className="flex justify-around flex-wrap gap-6 px-12">
+      <div className="flex justify-start flex-wrap gap-10 mx-auto px-12">
         {productslist?.map((details, index) => (
           <ProductCard key={index} items={details} />
         ))}
