@@ -35,14 +35,14 @@ function Page() {
               <div className='flex gap-3 justify-center items-center flex-wrap'>
                 <Link
                   href="/orderhistory"
-                  className="inline-block h-12 w-40 leading-[3rem] text-center text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] font-medium rounded transition duration-300"
+                  className="inline-block h-12 w-40 leading-[3rem] cursor-pointer text-center text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] font-medium rounded transition duration-300"
                 >
                   Order history
                 </Link>
 
                 <Link
                   href="/"
-                  className="inline-block h-12 w-40 leading-[3rem] text-center border border-[#de6a2a] text-[#de6a2a] hover:bg-orange-50 font-medium rounded transition duration-300"
+                  className="inline-block h-12 w-40 leading-[3rem] cursor-pointer text-center border border-[#de6a2a] text-[#de6a2a] hover:bg-orange-50 font-medium rounded transition duration-300"
                 >
                   Go to home
                 </Link>

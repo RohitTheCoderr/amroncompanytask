@@ -5,16 +5,21 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCart, removeFromCart } from '../../reduxStore/slices/cartSlice';
 import { TrashIcon } from '@heroicons/react/24/outline';
+import { postData } from '../utils/apicall';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 const CartPage = () => {
   const dispatch = useDispatch()
-
+const router = useRouter()
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);
 
   const cartlist = useSelector(state => state?.cart?.items?.listofproducts) || [];
 
+  console.log("cartlist", cartlist);
+  const ids = cartlist?.map(item => item._id);
 
   const cartTotals = cartlist?.reduce(
     (acc, item) => {
@@ -38,10 +43,38 @@ const CartPage = () => {
     { totalMRP: 0, totalOriginal: 0, totalDiscount: 0 }
   );
 
-
   const handledelete = (productId) => {
     dispatch(removeFromCart(productId));
   }
+
+
+  const handleorder = async () => {
+    const data = {
+      paymentMode: "Cash",
+      Quantity: 1,
+      size: "M",
+      productIds: [...ids],
+      totalAmount: cartTotals?.totalOriginal,
+    };
+
+    try {
+      const promise = postData("/users/order", data);
+      toast.promise(promise, {
+        pending: "Confirming your order...",
+        success: "Order placed successfully! 🎉",
+        error: "Order confirmation failed!",
+      });
+      const response = await promise;
+      if (response.success) {
+        dispatch(removeFromCart([...ids]));
+        router.push("/confirmorder");
+      }
+    } catch (err) {
+      toast.error(err.message || "Something went wrong");
+    }
+  };
+
+
 
 
   if (cartlist?.length <= 0) {
@@ -133,7 +166,7 @@ const CartPage = () => {
                 <span>₹{cartTotals?.totalOriginal}</span>
               </div>
             </div>
-            <Link href={"/checkout"}> <button className='text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] rounded-lg outline-none w-full mt-3 py-3 cursor-pointer text-lg'>Proceed to Checkout</button></Link>
+            <button onClick={handleorder} className='text-white hover:text-black bg-[#de6a2a] hover:bg-[#ffa264] rounded-lg outline-none w-full mt-3 py-3 cursor-pointer text-lg'>Proceed to Checkout</button>
           </div>
         </div>
       </div>

@@ -26,8 +26,6 @@ const LoginSchema = Yup.object().shape({
 export default function Detailsform({ setIscall }) {
 
   const dispatch = useDispatch();
-
-
   const handleSubmit = async (value) => {
     delete value.confirmpassword;
     try {
@@ -176,7 +174,7 @@ export default function Detailsform({ setIscall }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-[#de6a2a] hover:bg-[#ffa264] text-white font-semibold py-2 px-4 rounded"
+                className="w-full bg-[#de6a2a] hover:bg-[#ffa264] text-white cursor-pointer font-semibold py-2 px-4 rounded"
               >
                 {isSubmitting ? "Submiting in..." : "Submit"}
               </button>

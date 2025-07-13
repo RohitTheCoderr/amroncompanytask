@@ -1,6 +1,7 @@
 // redux/cartSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getData, postData } from "../../app/utils/apicall";
+import { toast } from "react-toastify";
 
 // Async thunks
 export const fetchCart = createAsyncThunk(
@@ -18,6 +19,7 @@ export const addToCart = createAsyncThunk(
     const data = postData("/users/addtocart", { productId, Quantity, size });
     const response = await data;
     if (response?.success) {
+     toast.success("Item added! 🛒 Ready to check out?");
       thunkAPI.dispatch(fetchCart());
     }
     return response?.data;
