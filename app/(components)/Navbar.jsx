@@ -48,7 +48,10 @@ function Navbar() {
 
 
   const handleAuthClick = () => {
-    if (token) {
+     const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    setToken(!!storedToken);
+
+    if (storedToken) {
       // localStorage.removeItem("token");
       dispatch(fetchCart());
       dispatch(clearToken());
@@ -62,7 +65,10 @@ function Navbar() {
 
 
   const handleCartClick = () => {
-    if (token) {
+     const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    setToken(!!storedToken);
+
+    if (storedToken) {
       router.push('/cart');
     } else {
       toast("please login first")

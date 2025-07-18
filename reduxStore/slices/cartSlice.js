@@ -9,22 +9,42 @@ export const fetchCart = createAsyncThunk(
   async (_, thunkAPI) => {
     const res = getData("/users/getusercartlist");
     const response = await res;
+    // console.log("cart data", response);
+    
     return response?.data; // Assuming your API returns `{ items: [...] }`
   }
 );
 
-export const addToCart = createAsyncThunk(
-  "cart/addToCart",
+// export const addToCart = createAsyncThunk(
+//   "cart/addToCart",
+//   async ({ productId, Quantity, size }, thunkAPI) => {
+//     const data = postData("/users/addtocart", { productId, Quantity, size });
+//     const response = await data;
+//     if (response?.success) {
+//      toast.success("Item added! 🛒 Ready to check out?");
+//       thunkAPI.dispatch(fetchCart());
+//     }
+//     return response?.data;
+//   }
+// );
+
+
+export const addOrUpdateCartItem = createAsyncThunk(
+  "cart/addOrUpdateCartItem",
   async ({ productId, Quantity, size }, thunkAPI) => {
     const data = postData("/users/addtocart", { productId, Quantity, size });
-    const response = await data;
+     const response = await data;
     if (response?.success) {
-     toast.success("Item added! 🛒 Ready to check out?");
+      toast.success("Cart updated!");
       thunkAPI.dispatch(fetchCart());
+    } else {
+      toast.error("Failed to update cart.");
     }
     return response?.data;
   }
 );
+
+
 
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",

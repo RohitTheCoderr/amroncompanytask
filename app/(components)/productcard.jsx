@@ -1,10 +1,9 @@
 'use client';
 import Image from 'next/image';
 import React, { useState } from 'react';
-
 import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../../reduxStore/slices/cartSlice';
+import { addOrUpdateCartItem } from '../../reduxStore/slices/cartSlice';
 import { setCheckoutProducts } from '../../reduxStore/slices/checkoutSlice';
 import { ShoppingCartIcon, } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
@@ -33,18 +32,18 @@ function ProductCard({ items }) {
   };
 
 
-  const handleaddtocart = () => {
+  const handleaddOrUpdateCartItem = () => {
     const token = localStorage.getItem("token");
     const product = {
       productId: _id, // replace with actual product ID
-      size: "M", // dynamically selected
+      size: "M",  // bydefault
       Quantity: 1
     };
-    
+
     if (token) {
-      dispatch(addToCart(product));
+      dispatch(addOrUpdateCartItem(product));
     } else {
-       toast("Please login first before adding product to cart");
+      toast("Please login first before adding product to cart");
       // router.push('/login')
       return
     }
@@ -53,7 +52,7 @@ function ProductCard({ items }) {
   return (
     <>
       <div className="relative h-[26rem] w-[15rem] bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
-        <div className='absolute right-4 top-4 z-30 rounded-full' ><ShoppingCartIcon onClick={handleaddtocart} className='h-6 w-6 text-gray-700 hover:text-[#de6a2a] cursor-pointer' /></div>
+        <div className='absolute right-4 top-4 z-30 rounded-full' ><ShoppingCartIcon onClick={handleaddOrUpdateCartItem} className='h-6 w-6 text-gray-700 hover:text-[#de6a2a] cursor-pointer' /></div>
         <div className="w-[100%] sm:w-[15rem] aspect-square mx-auto relative">
           <Image
             src={`data:${images[0]?.contentType};base64,${images[0]?.data}`}
@@ -86,7 +85,7 @@ function ProductCard({ items }) {
       </div>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white w-[90%] sm:w-[30rem] h-auto sm:min-h-[40rem] rounded-lg p-2 sm:p-4 relative">
+          <div className="bg-white w-[90%] sm:w-[30rem] h-auto sm:min-h-[35rem] rounded-lg p-2 sm:p-4 relative">
             {/* Close Button */}
             <div
               onClick={() => setIsModalOpen(false)}
@@ -94,7 +93,7 @@ function ProductCard({ items }) {
             >
               X
             </div>
-            <div className="w-[90%] sm:w-[18rem] aspect-square relative mx-auto mb-4">
+            <div className="w-[90%] sm:w-[14rem] aspect-square relative mx-auto mb-4">
               <Image
                 src={`data:${images[0]?.contentType};base64,${images[0]?.data}`}
                 alt={productName}

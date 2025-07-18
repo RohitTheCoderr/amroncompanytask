@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCart, removeFromCart } from '../../reduxStore/slices/cartSlice';
+import { addOrUpdateCartItem, fetchCart, removeFromCart } from '../../reduxStore/slices/cartSlice';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { postData } from '../utils/apicall';
 import { toast } from 'react-toastify';
@@ -11,14 +11,13 @@ import { useRouter } from 'next/navigation';
 
 const CartPage = () => {
   const dispatch = useDispatch()
-const router = useRouter()
+  const router = useRouter()
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);
 
   const cartlist = useSelector(state => state?.cart?.items?.listofproducts) || [];
 
-  console.log("cartlist", cartlist);
   const ids = cartlist?.map(item => item._id);
 
   const cartTotals = cartlist?.reduce(
@@ -47,18 +46,51 @@ const router = useRouter()
     dispatch(removeFromCart(productId));
   }
 
+  const handleQuantityChange = (productId, type) => {
+    const item = cartlist.find((i) => i._id === productId);
+    if (!item) return;
+
+    let newQuantity = item.Quantity;
+
+    if (type === "increment") {
+      newQuantity += 1;
+    } else if (type === "decrement" && item.Quantity > 1) {
+      newQuantity -= 1;
+    } else {
+      return; // Do nothing if quantity is already 1 (or 0)
+    }
+
+    dispatch(addOrUpdateCartItem({
+      productId,
+      Quantity: newQuantity,
+      size: item?.size || "M",
+    }));
+  };
+
+
+
+  const handleSizeChange = (productId, newSize) => {
+    const item = cartlist.find((i) => i._id === productId);
+    dispatch(addOrUpdateCartItem({
+      productId,
+      Quantity: item?.Quantity || 1,
+      size: newSize,
+    }));
+  };
 
   const handleorder = async () => {
     const data = {
       paymentMode: "Cash",
-      Quantity: 1,
-      size: "M",
-      productIds: [...ids],
+      productsdetails: cartlist.map(item => ({
+        productId: item._id,
+        Quantity: item.Quantity,
+        size: item.size
+      })),
       totalAmount: cartTotals?.totalOriginal,
     };
 
     try {
-      const promise = postData("/users/order", data);
+      const promise = postData("/users/moreorder", data);
       toast.promise(promise, {
         pending: "Confirming your order...",
         success: "Order placed successfully! 🎉",
@@ -74,15 +106,12 @@ const router = useRouter()
     }
   };
 
-
-
-
   if (cartlist?.length <= 0) {
     return (
       <div className="min-h-[80vh] flex flex-col justify-center items-center text-center">
         <p className="text-xl font-medium text-[#de6a2a] mb-4">Your cart is currently empty.</p>
         <Link href="/">
-          <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+          <button className="bg-orange-500 cursor-pointer text-white px-4 py-2 rounded hover:bg-orange-600">
             Go Shopping
           </button>
         </Link>
@@ -95,7 +124,6 @@ const router = useRouter()
       <h2 className='font-medium text-[#de6a2a] text-2xl text-center mb-8'>You cart products</h2>
       <div className='flex flex-wrap justify-around items-start'>
         <div className=' max-md:w-full w-1/2 gap-4 '>
-
           {cartlist?.map((item) => (
             <div key={item._id} className="flex bg-white w-full gap-4 items-start my-2 border-b border-gray-300 shadow p-3">
               <div className="w-28 h-28 relative rounded-sm overflow-hidden">
@@ -115,30 +143,40 @@ const router = useRouter()
                   <div className="flex gap-8 items-center">
                     <div className="flex items-center gap-1 text-sm">
                       Quantity:
-                      {/* <button
-                    onClick={decrement}
-                    className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400 cursor-pointer"
-                  >
-                    -
-                  </button> */}
+                      <button
+                        onClick={() => handleQuantityChange(item._id, "decrement")}
+                        className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400 cursor-pointer"
+                      >
+                        -
+                      </button>
                       <span className="bg-gray-200 px-3 py-1 rounded border text-black">
                         {item?.Quantity}
                       </span>
-                      {/* <button
-                    onClick={increment}
-                    className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400 cursor-pointer"
-                  >
-                    +
-                  </button> */}
+                      <button
+                        onClick={() => handleQuantityChange(item._id, "increment")}
+                        className="bg-gray-300 px-2 py-1 rounded hover:bg-gray-400 cursor-pointer"
+                      >
+                        +
+                      </button>
                     </div>
                     <div className="flex items-center text-sm">
                       Rs:
                       <span className="text-[#de6a2a] px-1 py-1 rounded">{item?.price}</span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+
+                  <div className="flex gap-2 items-center">
                     <label className="text-sm font-medium text-gray-700">Size:</label>
-                    {item.size}
+                    <select
+                      value={item.size}
+                      onChange={(e) => handleSizeChange(item._id, e.target.value)}
+                      className="border px-2 py-1 rounded"
+                    >
+                      <option value="S">S</option>
+                      <option value="M">M</option>
+                      <option value="L">L</option>
+                      <option value="XL">XL</option>
+                    </select>
                   </div>
                 </div>
               </div>

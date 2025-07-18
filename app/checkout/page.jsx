@@ -89,15 +89,17 @@ const Checkout = () => {
 
     const placeOrder = async () => {
       const data = {
-        paymentMode: "Cash",
+      paymentMode: "Cash",
+      productsdetails:[{
+        productId: _id,
         Quantity: quantity,
-        size: selectsize,
-        productIds: [_id],
-        totalAmount: totalprice,
-      };
+        size: selectsize
+      }],
+      totalAmount: totalprice,
+    };
 
       try {
-        const promise = postData("/users/order", data);
+        const promise = postData("/users/moreorder", data);
         toast.promise(promise, {
           pending: "Confirming your order...",
           success: "Order placed successfully! 🎉",
