@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addOrUpdateCartItem, fetchCart, removeFromCart } from '../../reduxStore/slices/cartSlice';
+import { addOrUpdateCartItem, clearcart, fetchCart, removeFromCart } from '../../reduxStore/slices/cartSlice';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { postData } from '../utils/apicall';
 import { toast } from 'react-toastify';
@@ -98,7 +98,7 @@ const CartPage = () => {
       });
       const response = await promise;
       if (response.success) {
-        dispatch(removeFromCart([...ids]));
+        // dispatch(clearcart());
         router.push("/confirmorder");
       }
     } catch (err) {

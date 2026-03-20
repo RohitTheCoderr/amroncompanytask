@@ -1,20 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { getData } from "../utils/apicall";
 import { toast } from "react-toastify";
+import Link from "next/link";
+import { useSelector } from "react-redux";
 
 export default function Page() {
-  const router = useRouter();
   const [moreorders, setMoreorders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(null);
 
-  useEffect(() => {
-    const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    setToken(!!storedToken);
-  }, []);
+  const token = useSelector((state) => state.auth.token);
 
   // fetching orderhistory
   useEffect(() => {
@@ -31,15 +27,33 @@ export default function Page() {
         setLoading(false);
       }
     };
-
-    fetchmoreHistory();
-  }, []);
-
+    if (token) {
+      fetchmoreHistory();
+    }
+  }, [token]);
 
   if (!token) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center font-semibold text-center">
-        Please log in to view your order history.
+      <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
+
+        <div className="bg-white shadow-md rounded-xl p-8 max-w-sm w-full">
+
+          <h2 className="text-xl font-semibold mb-2 text-gray-800">
+            You're not logged in
+          </h2>
+
+          <p className="text-sm text-gray-500 mb-6">
+            Please log in to view your order history.
+          </p>
+
+          <Link
+            href="/login"
+            className="inline-block bg-[#de6a2a] text-white px-6 py-2 rounded-md hover:bg-[#c85a22] transition"
+          >
+            Log In
+          </Link>
+
+        </div>
       </div>
     );
   }

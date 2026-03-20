@@ -44,6 +44,8 @@ export default function Home() {
     }
   }, [items]);
 
+ 
+
   return (
     <div className="w-full min-h-min">
       <Swiper

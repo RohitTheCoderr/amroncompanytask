@@ -9,6 +9,7 @@ import { store } from "../reduxStore";
 import ReduxProvider from "./ReduxProvider";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import AuthInitializer from "./(components)/AuthInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased scroll-auto`}
       >
         <ReduxProvider>
+           <AuthInitializer />
           <ToastContainer position="top-right" autoClose={3000} />
           <Navbar />
           {children}

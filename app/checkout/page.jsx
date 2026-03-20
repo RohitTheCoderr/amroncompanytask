@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import Detailsform from '../detailsform/page';
+import Detailsform from '../signIn/page';
 import { useRouter } from 'next/navigation'
 import { postData } from '../utils/apicall';
 import { toast } from 'react-toastify';

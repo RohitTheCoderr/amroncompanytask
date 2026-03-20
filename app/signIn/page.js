@@ -6,25 +6,28 @@ import { postData } from "../utils/apicall";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setToken } from "../../reduxStore/slices/authSlice";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const LoginSchema = Yup.object().shape({
   firstname: Yup.string()
     .min(2, "First name must be at least 2 characters")
-    .required("Required"),
+    .required("First name is required"),
   lastname: Yup.string()
     .min(2, "Last name must be at least 2 characters")
-    .required("Required"),
-  email: Yup.string().email("Invalid email").required("Required"),
+    .required(" Last name is required"),
+  email: Yup.string().email("Invalid email").required(" Email is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
-    .required("Required"),
+    .required("Password is required"),
   confirmpassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
-    .required("Required"),
+    .required("Confirm password is required"),
 });
 
 export default function Detailsform({ setIscall }) {
-
+  const router = useRouter();
   const dispatch = useDispatch();
   const handleSubmit = async (value) => {
     delete value.confirmpassword;
@@ -32,26 +35,44 @@ export default function Detailsform({ setIscall }) {
       const promise = postData("/users/create", value);
       toast.promise(promise, {
         pending: "Form Submitting..",
-        success: "Form Submitted successfully..",
-        reject: "Form can't be Submitted..",
+        success: "User created successfully..",
+        reject: "User can't be created...",
       });
       const response = await promise;
+
       if (response?.success) {
-          dispatch(setToken(response?.data?.token));
-        // localStorage.setItem("token", response?.data?.token);
+        dispatch(setToken(response?.data?.token));
         setIscall(true);
+        router.push("/");
       }
     } catch (error) {
+      const msg = error?.response?.data?.message || "Form can't be submitted..";
+      toast.error(msg);
       console.log("error occurred", error);
     }
   };
 
   return (
-    <div className=" flex items-center justify-center bg-gray-100 p-4">
+    // <div className=" flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-[85vh] flex flex-col md:flex-row items-center justify-center bg-gray-200 p-4 gap-6">
+      {/* Side Image */}
+      <div className="hidden md:flex relative w-full md:w-[50%] h-64 md:h-[30rem]">
+        <Image
+          src="/images/assests company newweb/mainbanner.png"
+          alt="Banner"
+          fill
+          className="object-contain md:object-contain rounded-lg"
+        />
+      </div>
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Fill Your Details
-        </h2>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-center mb-2 text-[#de6a2a]">
+            Create an Account
+          </h2>
+          <p className="text-center text-sm text-[#898989]">
+            Get started by filling in your details
+          </p>
+        </div>
         <Formik
           initialValues={{
             firstname: "",
@@ -68,45 +89,49 @@ export default function Detailsform({ setIscall }) {
         >
           {({ isSubmitting }) => (
             <Form className="space-y-4">
-              {/* firstname */}
-              <div>
-                <label
-                  htmlFor="text"
-                  className="block font-medium text-gray-700"
-                >
-                  First Name
-                </label>
-                <Field
-                  type="text"
-                  name="firstname"
-                  id="firstname"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                />
-                <ErrorMessage
-                  name="firstname"
-                  component="div"
-                  className="text-red-500 text-sm"
-                />
-              </div>
-              {/* lastname */}
-              <div>
-                <label
-                  htmlFor="text"
-                  className="block font-medium text-gray-700"
-                >
-                  Last Name
-                </label>
-                <Field
-                  type="text"
-                  name="lastname"
-                  id="lastname"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                />
-                <ErrorMessage
-                  name="lastname"
-                  component="div"
-                  className="text-red-500 text-sm"
-                />
+              <div className="flex justify-between gap-1.5 ">
+                {/* firstname */}
+                <div>
+                  <label
+                    htmlFor="text"
+                    className="block font-medium text-gray-700"
+                  >
+                    First Name
+                  </label>
+                  <Field
+                    type="text"
+                    name="firstname"
+                    id="firstname"
+                    placeholder="Enter first name"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  />
+                  <ErrorMessage
+                    name="firstname"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+                {/* lastname */}
+                <div>
+                  <label
+                    htmlFor="text"
+                    className="block font-medium text-gray-700"
+                  >
+                    Last Name
+                  </label>
+                  <Field
+                    type="text"
+                    name="lastname"
+                    id="lastname"
+                    placeholder="Enter last name"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  />
+                  <ErrorMessage
+                    name="lastname"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
               </div>
               <div>
                 <label
@@ -119,6 +144,7 @@ export default function Detailsform({ setIscall }) {
                   type="email"
                   name="email"
                   id="email"
+                  placeholder="Enter email password"
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                 />
                 <ErrorMessage
@@ -140,6 +166,7 @@ export default function Detailsform({ setIscall }) {
                   type="password"
                   name="password"
                   id="password"
+                  placeholder="Enter password"
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                 />
                 <ErrorMessage
@@ -161,6 +188,7 @@ export default function Detailsform({ setIscall }) {
                   type="password"
                   name="confirmpassword"
                   id="confirmpassword"
+                  placeholder="Confirm password"
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                 />
                 <ErrorMessage
@@ -178,6 +206,15 @@ export default function Detailsform({ setIscall }) {
               >
                 {isSubmitting ? "Submiting in..." : "Submit"}
               </button>
+              <div className="w-full text-right">
+                <Link
+                  href={"/login"}
+                  className="text-black hover:text-blue-600 text-sm "
+                >
+                  {" "}
+                  I have already an account
+                </Link>
+              </div>
             </Form>
           )}
         </Formik>

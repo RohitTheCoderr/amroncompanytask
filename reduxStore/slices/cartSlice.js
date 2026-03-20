@@ -9,8 +9,6 @@ export const fetchCart = createAsyncThunk(
   async (_, thunkAPI) => {
     const res = getData("/users/getusercartlist");
     const response = await res;
-    // console.log("cart data", response);
-    
     return response?.data; // Assuming your API returns `{ items: [...] }`
   }
 );
@@ -27,6 +25,19 @@ export const fetchCart = createAsyncThunk(
 //     return response?.data;
 //   }
 // );
+
+export const clearcart = createAsyncThunk(
+  "cart/clearcart",
+  async (_, thunkAPI) => {
+    const data = postData("/users/clearcart");
+    const response = await data;
+    if (response?.success) {
+     toast.success("Cart is Empty");
+      thunkAPI.dispatch(fetchCart());
+    }
+    return response?.data;
+  }
+);
 
 
 export const addOrUpdateCartItem = createAsyncThunk(
