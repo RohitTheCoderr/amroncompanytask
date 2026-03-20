@@ -32,6 +32,11 @@ export default function LoginPage() {
       const response = await promise;
       if (response?.data?.token) {
         dispatch(setToken(response?.data?.token));
+        if (window.history.length > 1) {
+          router.back();
+        } else {
+          router.push("/"); // fallback
+        }
       }
     } catch (error) {
       console.log("error occured while login", error);
@@ -53,12 +58,12 @@ export default function LoginPage() {
 
       {/* Login Form */}
       <div className="w-full md:w-[26rem] bg-white p-6 rounded-lg shadow-md">
-      <div className=" mb-6 ">
-        <h2 className="text-2xl font-bold mb-2 text-center text-[#de6a2a]">
-          Login your Account
-        </h2>
-         <p className="text-center text-sm text-[#898989]">Fill the details to create your account</p>
-      </div>
+        <div className=" mb-6 ">
+          <h2 className="text-2xl font-bold mb-2 text-center text-[#de6a2a]">
+            Login your Account
+          </h2>
+          <p className="text-center text-sm text-[#898989]">Fill the details to create your account</p>
+        </div>
         <Formik
           initialValues={{ email: '', password: '' }}
           validationSchema={LoginSchema}
@@ -107,9 +112,9 @@ export default function LoginPage() {
               >
                 {isSubmitting ? 'Logging in...' : 'Login'}
               </button>
-           <div className="w-full text-right">
-              <Link href="/signIn" className='text-sm text-black hover:text-blue-500'>Don't have an account</Link>
-             </div>
+              <div className="w-full text-right">
+                <Link href="/signIn" className='text-sm text-black hover:text-blue-500'>Don't have an account</Link>
+              </div>
             </Form>
           )}
         </Formik>

@@ -43,7 +43,11 @@ export default function Detailsform({ setIscall }) {
       if (response?.success) {
         dispatch(setToken(response?.data?.token));
         setIscall(true);
-        router.push("/");
+        if (window.history.length > 1) {
+          router.back();
+        } else {
+          router.push("/"); // fallback
+        }
       }
     } catch (error) {
       const msg = error?.response?.data?.message || "Form can't be submitted..";
